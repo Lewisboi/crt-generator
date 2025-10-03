@@ -96,7 +96,20 @@ impl ToString for CSRConfig {
     }
 }
 
+fn check_openssl() -> Result<(), Box<dyn std::error::Error>> {
+    Command::new("openssl")
+        .arg("version")
+        .output()
+        .map_err(|_| {
+            "OpenSSL not found. Please install it:\n\
+                      - Ubuntu/Debian: sudo apt install openssl\n\
+                      - macOS: brew install openssl\n\
+                      - Windows: https://slproweb.com/products/Win32OpenSSL.html"
+        })?;
+    Ok(())
+}
 fn main() -> Result<(), Box<dyn std::error::Error>> {
+    check_openssl()?;
     let csr_config_command = CSRConfigCommand::parse();
 
     let csr_config: CSRConfig = match &csr_config_command.from_file {
